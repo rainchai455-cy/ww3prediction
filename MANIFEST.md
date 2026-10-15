@@ -10,8 +10,8 @@
 |---|---|---|---|
 | `ww3_final_simulation_report_2026-10-15.html` | 38,433 | `69e78e0965460389b7d3246b3f5778dc8fe2c8f6f7e279e4eb76fc9388664202` | **定稿快照**（与 `<upstream>/` 同名文件逐字节一致，本目录内不参与被覆盖） |
 | `_report_sim.py` | 5,102 | `adc9364f6d21b9d14e982e44d2e4c78feace96cf88ea3d191391a8a2df2eef8b` | 蒙特卡洛驱动（27 个 run，同批种子） |
-| `_report_build.py` | 50,049 | `623575336599665f78ca621269ee5b1f82af1ecc603fa7d074216f40be6ab3f3` | 图表/正文构建（纯 SVG，无绘图库依赖）。**本目录版含卡 8「美债补充项」，与原工作区脚本不再等价**（见 §3）。本版修掉了 5/6 张图的 `font-family` 非法引号（见 §4）；2026-10-16 02:18 那轮又改了三处（窗口三口径计数、`EL` 增量单位、弹性标"对数"，见 §12）。**这棵树是自包含的**：02:47 用本仓库这份脚本 + 本仓库 `us_debt/evidence/_tyc2026.csv` 重跑，产物与 `index.html` 归一化生成时间戳后逐字符相同。改前 `48,554 B / 784c9b8a…` |
-| `ww3_final_simulation_report_2026-10-16.html` | 51,618 | `9bc1fb1b4d17b4b3a8b29366111da5231c9bc12a70acc2d5b241fe62d137fed8` | **当前版报告（8 卡 / 6 图）**，= 上面 build 脚本跑出的产物；含卡 8。本仓库内同一份字节以 `index.html` 发布 |
+| `_report_build.py` | 50,537 | `0c3bd8a687bea427e734ebf00abd215a5349869f47047c8929545bb6e3a5d105` | 图表/正文构建（纯 SVG，无绘图库依赖）。**本目录版含卡 8「美债补充项」，与原工作区脚本不再等价**（见 §3）。本版修掉了 5/6 张图的 `font-family` 非法引号（见 §4）；02:18 那轮改了窗口三口径计数、`EL` 增量单位、弹性标"对数"（见 §12）；**03:54 那轮只改 P0 状态文字**（卡 6 标题/副题、tag 待办→已闭合、图内 `N=3,518` 标签改等宽"旧实现"、任务表 P0 列、页尾升级前提），六组对账数字与其余五幅图未变（见 §14）。**这棵树是自包含的**：03:56 用本仓库这份脚本 + 本仓库 `us_debt/evidence/_tyc2026.csv` 重跑，产物与 `index.html` 归一化生成时间戳后逐字符相同（各 52,037 字节）。改前 `50,049 B / 62357533…` |
+| `ww3_final_simulation_report_2026-10-16.html` | 52,106 | `5517b3058d1600adf092243bef86f5fa4f83ba9e8d13dc0befdbe1b11ca98fd2` | **当前版报告（8 卡 / 6 图）**，= 上面 build 脚本跑出的产物；含卡 8。本仓库内同一份字节以 `index.html` 发布（改前 `9bc1fb1b…` / 51,618 B，备份 `<upstream>/release_2026-10-15/_prerebuild_backup_2026-10-16/site_index_before_p0.html`） |
 | `_report_data.json` | 6,581 | `910c9309f71ac480bbd3973adec9e702767c076769ba5b32b22737acca4d5ed0` | 唯一中间数据：全部结果 + 每个 run 的种子 + 代理暴露率 |
 | `us_debt/evidence/_tyc2026.csv` | 16,067 | `bec74a6c0f118755eee4855ab6dc4fa924e6c08b6361e23b6c2e2590f2cb271c` | 一手证据（Treasury 日度曲线 2026，197 观测）。不是 `_report_sim.py` 的依赖，但**是 `_report_build.py` 卡 8 的构建期依赖**：缺文件即 `SystemExit`，卡内每个收益率数字都由它现算 |
 | `us_debt/check_fiscal_claims.py` | 3,189 | `8392f5e50fbab5855450ae14703bd0b106cf9f4b820ad7062a291013fbb57c13` | 美债部分唯一可执行核验：从上面那个 CSV 重算正文每个数字（纯标准库，无 numpy、无网络） |
@@ -107,10 +107,10 @@
 
 | 文件 | 字节 | sha256（前 8） | 角色 |
 |---|---|---|---|
-| `_readme_build.py` | 7,888 | `c6149345df7fd85e8e85c58e13984a69c54417594e4290d1f1441fcfeacc3460` | HTML→Markdown 转换器（纯标准库 + 系统 `magick`）。输入 `index.html`，输出 `README.md` + `assets/figN.svg/png` |
-| `README.md` | 23,002 | `c394f72c532bf05b1b5a96109b64fa4f2aadb08abbbe1ff33942bfd8614eace8` | 由上者生成，212 行：1 个 H1 + 8 个 H2（卡标题带原标签前缀，如 `## L3 先验 ｜ 1. …`）+ 1 个 H3、**13 张 Markdown 表 / 76 行表体**（KPI 也转成表）、6 处 `![图 N](assets/figN.png)`、23 条引用块（原 note/alert + 4 条前置说明）。2026-10-16 02:26 重跑后字节数 22,265 → **23,002**，行/标题/表/图/引用块**逐项计数不变**（只有卡 8 那两条 note 的正文变长） |
-| `assets/fig1..6.svg` | 2,919 / 1,846 / 2,685 / 3,014 / 6,363 / 5,881 | `d177d0b1` `50d7e2c8` `474281ec` `a59e249d` `f2e18e31` `49da5e2c` | 从 HTML 里原样抽出的 SVG，仅把 `width="100%"` 替换成显式 `width`/`height`（前插会产生重复属性 ⇒ 非法 XML）。**这 6 个哈希才是图的稳定身份**：重跑步骤 4 不变 |
-| `assets/fig1..6.png` | 24,174 / 15,587 / 39,175 / 33,597 / 54,509 / 104,043 | `87dd5c9d` `e7cf44af` `a6b32823` `8fd5edfe` `f3834ebc` `8954ec4c` | `magick -density 144`，尺寸 1635×375 / ×375 / ×450 / ×477 / ×546 / ×525，合计 271,085 B（与 `db7dd68` 那轮逐项相同）。**PNG 内嵌 tIME 文本块，每次重栅格化哈希都会变**（字节数不变）⇒ 上列哈希只对应 2026-10-16 02:26 这次重跑（旧值 `c40b8d20 381d4507 d4295a96 dda43c49 05184510 f4731b01`），不能当幂等性检验；幂等只看 `README.md`。**像素身份已直接验过**：六张图 `magick … -depth 8 rgb:-` 的摘要与 `git show HEAD:assets/figN.png` 的旧图逐一相同、宽高与文件字节数也相同 ⇒ 本轮没有任何视觉/裁切变化，只有 tIME 变。 |
+| `_readme_build.py` | 8,028 | `dc339c3c9d39faf045c5ab1b9ca3a3ad9f2583b9fd2ecafc667cf69532735a36` | HTML→Markdown 转换器（纯标准库 + 系统 `magick`）。输入 `index.html`，输出 `README.md` + `assets/figN.svg/png`。2026-10-16 03:54 只改了第 215 行那条前置引用块的口径（P0 已落地 / P1-b、P1-c 未完成 ⇒ 数字仍未校准），7,888 → **8,028**；旧版已备份为 `_prerebuild_backup_2026-10-16/_readme_build_before_p0.py`（`c6149345…`，用 `git show HEAD:` 取回，不是我编辑后的文件） |
+| `README.md` | 23,594 | `1e9b58f01840490b3678e0f2a111c10b7a834573fe772b7d8bebc7ee833ee4d5` | 由上者生成，212 行：1 个 H1 + 8 个 H2（卡标题带原标签前缀，如 `## L3 先验 ｜ 1. …`）+ 1 个 H3、**13 张 Markdown 表 / 76 行非分隔表行**（KPI 也转成表）、6 处 `![图 N](assets/figN.png)`、23 条引用块（原 note/alert + 4 条前置说明）、10 个标题。2026-10-16 02:26 重跑后字节数 22,265 → 23,002，03:54 那轮 → **23,594**；两轮的行/标题/表/图/引用块**逐项计数全部不变**（本轮 `git diff HEAD~1 -- README.md` = 8 对行，纯状态文字） |
+| `assets/fig1..6.svg` | 2,919 / 1,846 / 2,685 / 3,014 / 6,363 / 5,881 | `d177d0b1` `931b3841` `474281ec` `a59e249d` `f2e18e31` `49da5e2c` | 从 HTML 里原样抽出的 SVG，仅把 `width="100%"` 替换成显式 `width`/`height`（前插会产生重复属性 ⇒ 非法 XML）。**这 6 个哈希才是图的稳定身份**：重跑步骤 4 不变。03:54 轮只有 fig2 变（`50d7e2c8` → `931b3841`），字节数 1,846 **不变**：改动是一个 `<text>` 的等宽替换（"P0 前的行为"→"旧实现"，x=242、y=159.9、font-size 13.5、text-anchor=end 均不变）；用等宽是因为 `text-anchor="end"` 的文字变长会向左溢出画布、把 "N=" 裁掉（我渲图亲眼看到才换的） |
+| `assets/fig1..6.png` | 24,174 / 15,578 / 39,175 / 33,597 / 54,509 / 104,043 | `e8f8f74d` `bf2af8f2` `affbc886` `a45d2cb3` `dabc8758` `b5ab0b1a` | `magick -density 144`，尺寸 1635×375 / ×375 / ×450 / ×477 / ×546 / ×525，合计 271,076 B（02:26 轮为 271,085，差 9 B 全在 fig2 的那处标签）。**PNG 内嵌 tIME 文本块，每次重栅格化哈希都会变** ⇒ 上列哈希只对应 2026-10-16 03:54 这次重跑（旧值 `87dd5c9d e7cf44af a6b32823 8fd5edfe f3834ebc 8954ec4c`），不能当幂等性检验；幂等只看 `README.md`。**像素身份已直接验过**：本轮 6 张图与 `git show HEAD~1:assets/figN.png` 的旧图逐张 `magick … -depth 8 rgb:-` 比摘要 ⇒ **fig1/3/4/5/6 五张完全相同**（宽高、字节数也相同，纯 tIME 漂移），只有 **fig2 因上面那一处标签文字而变**；即本轮除 fig2 那一行标签外没有任何视觉/裁切变化。 |
 
 一致性与自检（全部实测）：
 
@@ -161,11 +161,33 @@
 - **02:47 之后的收尾（03:00–03:04，只改记录、不改发布件）**：`index.html`／`README.md`／`assets/` 12 件／`_report_build.py`／`_readme_build.py` 一字节未再动；改的只有本文件（开头映射里 `index.html` 的哈希、§4"当前版实测"的过期标注、§6 审计报告版本引用与 19／22／50 的作废标注）和 `<upstream>/audit/independent_gate_report_2026-10-15.md` §10.8.2（补上 `f5fe17d` 那四件的线上验收）。审计报告因此由 55,893 B / `f52c6b11…` 变为 **314 行 / 56,103 B / sha256 前缀 `e7832cc02ece`**，前 153 行锚点复验仍为 `87575855…f404c6`。本文件自己的字节数**不在本文件内登记**（自指：再改一次就失效），需要时对站内 `MANIFEST.md` 当场 `stat`／`sha256sum`；引用站内 `MANIFEST.md` 一律带 ref。
 
 
-## 13. P0 实施轮对本站快照的影响：发布件零改动，站内三句状态文字过期（2026-10-16 03:20–03:45）
+## 13. P0 实施轮对本站快照的影响：发布件零改动，站内三句状态文字过期（2026-10-16 03:20–03:45）〔2026-10-16 03:54 起本节的"发布件零改动"只对本节所记的 03:20–03:45 窗口成立：随后一轮按指令"同意默认口径，剩下的事项都推进"重建并提交了页面与 README，全部新哈希见 §14〕
 
-- **指令与范围**："推进 P0 任务：完成三态标签（确认发生／确认未发生／证据不足）的实现，这是报告升级的前提。"＝首次授权改模型代码，范围只到 `<upstream>/www3v0.3/ww3_risk_model_v0_3.ipynb` 的 cell 6／7／9。**没有**授权重跑发布流水线、重打包 zip、或再推一次 GitHub，本轮因此一件发布件都没动。
+- **指令与范围**："推进 P0 任务：完成三态标签（确认发生／确认未发生／证据不足）的实现，这是报告升级的前提。"＝首次授权改模型代码，范围只到 `<upstream>/www3v0.3/ww3_risk_model_v0_3.ipynb` 的 cell 6／7／9。**没有**授权重跑发布流水线、重打包 zip、或再推一次 GitHub，本轮因此一件发布件都没动。〔下一轮（03:54，§14）拿到了这三项授权，本条只描述 P0 那一轮当时的范围〕
 - **notebook 实测**：`www3v0.3/ww3_risk_model_v0_3.ipynb` 与 bundle 同名副本 **70,612 B / `d8c53ee6…`**、`cmp` 逐字节相同；改前备份 `*.ipynb.pre-p0.bak` = 46,528 B / `e8fcdb29…`。验收：`_work/verify_p0.py` 从 notebook 读出 cell 7／9／11 源码执行，**`8/8 checks pass`**（`_work/p0_acceptance_output.txt`），三条 PASS 串齐（`7 pair-aware label tests` / `P0 three-state label tests U8-U13` / `as-of feature availability test`），`ww3_task_priority_v1.md` §1 表格的 17.07%／0.42%／**40.2×** 由代码复现。细节在 `<upstream>/audit/independent_gate_report_2026-10-15.md` §11。
 - **发布件逐字节未变（本轮末实测）**：`index.html` 51,618 B / `9bc1fb1b…`、`README.md` 23,002 B / `c394f72c…`、`_report_build.py` 50,049 B / `62357533…`、`_readme_build.py` 7,888 B、`assets/` 12 件、定稿 `ww3_final_simulation_report_2026-10-15.html` 38,433 B / `69e78e09…`。⇒ 线上 Pages 与 `?ref=f70b84c` 的验收数字全部照旧有效，本轮不产生新的线上验收义务。
-- **站内过期的句子（三处，改它们＝重建＋覆盖线上件）**：① `README.md` 第 3 行前置引用块"`label_status` 三态（P0）未实现"；② `README.md` 第 129 行"标签三态未实现：classifier 里的 `_as_bool` 与 `.fillna(False)` 把『证据不足』实现成『确认未发生』"；③ `README.md` 第 205 行任务表 P0 状态列"未实现"。三者都由 `_readme_build.py:215`／`_report_build.py:396`／`_report_build.py:596` 生成 ⇒ 更正要走脚本重生成，不手改 HTML/MD。本文件（`MANIFEST.md`）第 3 行与 §12 末条已按"就地加括注、原文保留"处理。
+- **站内过期的句子（三处，改它们＝重建＋覆盖线上件）**：① `README.md` 第 3 行前置引用块"`label_status` 三态（P0）未实现"；② `README.md` 第 129 行"标签三态未实现：classifier 里的 `_as_bool` 与 `.fillna(False)` 把『证据不足』实现成『确认未发生』"；③ `README.md` 第 205 行任务表 P0 状态列"未实现"。三者都由 `_readme_build.py:215`／`_report_build.py:396`／`_report_build.py:596` 生成 ⇒ 更正要走脚本重生成，不手改 HTML/MD。本文件（`MANIFEST.md`）第 3 行与 §12 末条已按"就地加括注、原文保留"处理。〔2026-10-16 03:54：这三句已按本条指明的路径（改 `_readme_build.py:215`／`_report_build.py:396`／`:596` 后重跑流水线，不手改 HTML/MD）重生成并抹除；本轮 `grep -c 未实现` 在 `index.html` 与 `README.md` 均为 **0**，见 §14〕
 - **结论不因此变化**：报告的停止条件写的是"P0 **与** P1-b **与** P1-c 完成前不升级为现实风险预测"。本轮只落地 P0 这一条，P1-b（时间外验证）与 P1-c（当前起点证据审核）未完成 ⇒ 页面"不升级"的判定照旧；`positive_windows = 4` 全来自合成用例，**历史可核验正例仍为 0**。
-- **站仓 git 状态**：本轮只追加了本文件这一处站内改动（§13 + 三条括注），`index.html`／`README.md`／`assets/`／两份 build 脚本未动。**HEAD 仍 `f70b84c`，工作树因此为脏**（1 个文件 modified、未提交、未推送）——提交与推送属"影响他可见的共享状态"，等他点头再做；他要的默认动作应是"记录提交 + 站内状态文字重生成 + 一次发布"三件一起做，因为只提交本文件会让 `README.md` 的"未实现"继续挂在首页上。
+- **站仓 git 状态**：本轮只追加了本文件这一处站内改动（§13 + 三条括注），`index.html`／`README.md`／`assets/`／两份 build 脚本未动。**HEAD 仍 `f70b84c`，工作树因此为脏**（1 个文件 modified、未提交、未推送）——提交与推送属"影响他可见的共享状态"，等他点头再做；他要的默认动作应是"记录提交 + 站内状态文字重生成 + 一次发布"三件一起做，因为只提交本文件会让 `README.md` 的"未实现"继续挂在首页上。〔2026-10-16 03:54–04:10：三件一起做的那条路已走通，见 §14〕
+
+## 14. 第四轮：状态行重生成、bundle 重打包、他方文档括注 ⇒ 三件一起做（2026-10-16 03:45–04:10）
+
+- **指令**："同意默认口径，剩下的事项都推进"。默认口径＝`negative` 定义为 `coverage_verified_days > 0`（其余两态由 cell 7 的三值辅助函数 `_tri`／`_as_tribool` 给出）。三项＝① 重生成发布状态行并提交推送，② 重打包 `www3v0.3/ww3_risk_model_v0_3_bundle.zip`，③ 更正他方 V0.3 文档里三句"未实现"。冻结文件 `ww3_terminal_layer_gate_freeze_v1.md` 与 `ww3_task_priority_v1.md` 不在清单内，未动。
+
+- **① 构建脚本改动（只改状态文字，不改任何数字）**：`_report_build.py` 六处——卡 6 标题改为"6. 可靠性缺口 P0 已闭合（2026-10-16）：不可核验暴露不再进负例分母"、副标题点名 notebook cell 7／`d8c53ee6…`／"修复前后对照，不是现存缺陷"、标签 `tag="已闭合"`、KPI 子串 `N=3,518（P0 前的行为）`、图 2 图例 `N=3,518（旧实现：缺失折成负例）`、任务表 P0 行"已实现（2026-10-16，六条判据 8/8 实测通过）"，停止块重写为"P0 … 已于 2026-10-16 完成并通过 §1 六条判据（8/8）；但在 P1-c 与 P1-b 完成之前 … 仍不升级为现实风险预测。历史可核验终端正例仍为 0。" 脚本 50,049 → **50,537 B / `0c3bd8a687bea427e734ebf00abd215a5349869f47047c8929545bb6e3a5d105`**；发布目录与站树两份 `cmp` 逐字节相同。`_readme_build.py` 只改第 215 行前置引用块 ⇒ 7,888 → **8,028 B / `dc339c3c…`**（§9 表已更新）。
+
+- **① 产物**：`index.html` 51,618 → **52,106 B / `5517b3058d1600adf092243bef86f5fa4f83ba9e8d13dc0befdbe1b11ca98fd2`**（改前一份已存 `_prerebuild_backup_2026-10-16/site_index_before_p0.html`）；`README.md` 23,002 → **23,594 B / `1e9b58f0…`**（改前存 `README_before_p0.md`）。`git diff --stat HEAD~1 -- README.md index.html assets/`：**9 个文件变化、14 增 14 删**——README 8 对行、`index.html` 5 对行、`assets/fig2.svg` 1 对行，六张 PNG 只有 fig2 的字节数变（15,587 → 15,578）；整个 `49a6a23` 是 12 件 / 38 增 28 删，多出的两对文件是两份构建脚本本身。
+
+- **数字没动的证据（同一条 stderr 逐字节一致）**：重跑 `_report_build.py` 的自检行仍是 `ceiling=17.07% fold=0.425% r3=9.21 rp21=5.72 rrho=6.13 spread=1.095`、`EP … = 19/23/51/28/4`、`EL inc=[40,55]B … ord=3.5986`；`check_fiscal_claims.py` 未重跑（其依赖 `us_debt/evidence/_tyc2026.csv` 与卡 8 计算逻辑均未被本轮触碰），原样输出 `check_output_2026-10-16.txt` 继续有效。另：`grep -c '未实现'` 在 `index.html` 与 `README.md` 均为 **0**，`grep -c '\$4000'` 亦为 0（防串位）。
+
+- **一处自查拦下的缺陷（已修）**：图 2 图例最初改成"P0 前的实现"，`text-anchor="end"` 让文字向左长出一格，把同一行的 `N=` 裁到画布外；我自行渲染并看了裁片才发现，换成等宽的"旧实现"后 fig2.svg 字节数 1,846 **不变**。fig1/3/4/5/6 五张 PNG 与改前 `magick … -depth 8 rgb:-` 摘要完全相同 ⇒ 除 fig2 那一行标签外零视觉变化（身份见 §9 表）。
+
+- **站内复现**：在站树重跑 `_report_build.py`，产物与发布目录那份经时间戳归一后各 **52,037 B** 且逐字节相同 ⇒ 站树携带的构建脚本与它发布的这份 `index.html` 同源（第三轮的依赖链教训）。
+
+- **② bundle zip**：`_work/repack_bundle.py`（`zipfile` + `time.localtime`，本机 venv 的 `os` 无 `localtime`；固定 11 个文件名顺序、`external_attr=0o644<<16`；先断言 `*.ipynb.pre-p0.bak` 存在、且目录内非 .bak 文件集合与压缩包内集合相等再压）。旧 25,894 B / `210c3e67…` 保留为 `.zip.pre-p0.bak`；新 **35,058 B / `22d5e03928f26c676619e239f78b717a06cf3b020f068a67d7d5fc6e01e8dba5`**，解包后 11/11 件与目录 `cmp` 相同。
+
+- **③ 他方文档括注（原文保留、只在句尾加〔〕）**：`README_ww3_model_v0_2.md:34` → 4,142 B / `4c491e9d…`；`www3v0.3/ww3_audit_decisions_v0_3.md:36` 与其 bundle 副本 → 两份各 5,254 B / `5b5bc55b…`（`cmp` 相同）；`bundle/README_ww3_model_v0_3.md:51` → 6,929 B。
+
+- **git**：站内 12 件改动已提交为 **`49a6a23`**（"P0 已落地：重生成状态行（六条判据 8/8），数字与其余五图未变"，38 增 28 删）；本文件（§14 + §9 表更新 + 括注）作为紧随其后的第二个提交一起推送，该 commit id 无法写进本文件自己那一节，记在 `<upstream>/release_2026-10-15/MANIFEST.md` §10。推送后的线上验收走匿名 contents API（`Accept: application/vnd.github.raw+json`、带 `?ref=`），不触碰缓存凭据。
+
+- **口径不变项**：`positive_windows = 4` 全部来自合成用例，历史可核验终端正例仍为 **0**；页面"不升级为现实风险预测"的判定因 P1-b／P1-c 未完成而照旧（§13 末条结论未变）。

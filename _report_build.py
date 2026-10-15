@@ -226,7 +226,7 @@ s4 = svg_matrix(rows, cols, cells, w=1090, cellw=190)
 s5 = svg_log_bars([
   ("N=80（可核验 pair-year 暴露）", ceiling, None, None, C1, "同一对象：单一大国 pair 的严格终端事件五年累计率"),
   ("N=3,012（仅剔除日精度不足 506 行）", ceiling_3012, None, None, C3, ""),
-  ("N=3,518（现实现：缺失折成负例）", ceiling_fold, None, None, CAUT, "分母折叠后的虚假收窄（见卡 6）"),
+  ("N=3,518（旧实现：缺失折成负例）", ceiling_fold, None, None, CAUT, "分母折叠后的虚假收窄（见卡 6）"),
 ], h=250, axlab="对数轴（对象=单一大国 pair 的严格终端事件五年累计率；画的是它的 95% 上界，单位 %）")
 
 def tbl(head, body):
@@ -392,18 +392,18 @@ body.append(card("5. 为什么终端数字只能是先验：六个来源的可�
   '<li>COW MID 5.0：大国对争端 232 个／33 dyad，<code>fatality≥1</code> 39 个，其中 <b>38 个开始于 1993 年前</b>（事件层无覆盖）；改为"双侧致命"只剩 <b>17 个</b>且各只给 1 个争端级日期；事件层（唯一日期即交战日的层）大国对 234 个事件里致命 <b>1</b> 个（2001-04-01）⇒ 致命多日期组合 = <b>0</b>。</li>'
   '<li>1969 中苏 MID 349：start→end = <b>286 天</b>，连"首尾两日期"都超 90 天窗。</li></ul>', tag="证据", tagc="#3f9d78"))
 
-body.append(card("6. 唯一还没闭合的可靠性缺口（P0）",
-  "标签三态未实现：classifier 里的 <code>_as_bool</code> 与 <code>.fillna(False)</code> 把「证据不足」实现成「确认未发生」。",
+body.append(card("6. 可靠性缺口 P0 已闭合（2026-10-16）：不可核验暴露不再进负例分母",
+  "三态标签已实现：notebook cell 7（70,612 B / <code>d8c53ee6…</code>）现返回 <code>label_status</code> ∈ {positive, negative, indeterminate_resolution}，<code>_as_bool</code> 与 <code>.fillna(False)</code> 折叠已删除，不可核验窗口退出 <code>verifiable_negative_windows</code>。下面三条上界是<b>修复前后对照</b>，不是现存缺陷。",
   '<div class="kpi"><div><b>%s</b><span>N=80：单对严格终端五年累计率的上界</span></div>'
   '<div><b>%s</b><span>N=3,012（仅剔除 506 行日精度缺口）</span></div>'
-  '<div><b>%s</b><span>N=3,518（现实现行为）</span></div>'
+  '<div><b>%s</b><span>N=3,518（P0 前的行为）</span></div>'
   '<div><b>%.1f×</b><span>同一对象、同一正例数下的虚假收窄倍数</span></div></div>'
   '<p class="note"><b>为什么这里的 %.1f× 有效、卡 2 撤下的 1178× 无效</b>：本卡三条上界是<b>同一个估计对象</b>'
   '（单一大国 pair 的严格终端五年累计率），只有分母 N 不同（80 → 3,012 → 3,518），所以相除得到的是纯粹的分母口径差异；'
   '卡 2 的 1178× 则跨了对象（单对严格率 ↔ 系统级代理事件），没有统计含义。上界族的图形见卡 2。</p>'
   '<p class="note">误标面实测：UCDP 日精度缺口 506/3,518=14.38%%；MID 致命大国对行 <code>fatalpre</code> 未知 82/83=98.80%%；ICB1 非法日历日 50/512=9.77%%。'
-  '口径限定：三个 N 的总体不同（pair-year vs dyad-year），本卡只演示"分母折叠"这一种错误的量级，不构成合法上界。P0 的 6 条验收判据见 <code>ww3_task_priority_v1.md</code> §1，代码尚未落地。</p>'
-  % (pct(ceiling, 2), pct(ceiling_3012, 2), pct(ceiling_fold, 2), ceiling / ceiling_fold, ceiling / ceiling_fold), tag="待办", tagc=CAUT))
+  '口径限定：三个 N 的总体不同（pair-year vs dyad-year），本卡只演示"分母折叠"这一种错误的量级，不构成合法上界。P0 的 6 条验收判据（<code>ww3_task_priority_v1.md</code> §1）已于 2026-10-16 全部实测通过（8/8），判据实测值记在审计报告 §11。</p>'
+  % (pct(ceiling, 2), pct(ceiling_3012, 2), pct(ceiling_fold, 2), ceiling / ceiling_fold, ceiling / ceiling_fold), tag="已闭合", tagc=CAUT))
 
 body.append(card("7. 复现信息、更正记录与结果边界",
   "所有数字可用同一脚本一次重跑得到；每个 run 的种子随结果一起落进 <code>_report_data.json</code>。",
@@ -593,7 +593,7 @@ S8N4 = ('<p class="note"><b>文献许可的是交互项，且带两个符号相�
         '理论结论不得当作本模型的系数直接引用。</p>')
 
 S8N5 = tbl(["阶段", "验收目标", "本卡的状态"], [
-    ["P0（唯一高优先级）", "三态标签；缺失不转 <code>False</code>；未核验暴露退出负例分母（判据沿用 <code>ww3_task_priority_v1.md</code> §1 六条）", "未实现"],
+    ["P0（唯一高优先级）", "三态标签；缺失不转 <code>False</code>；未核验暴露退出负例分母（判据沿用 <code>ww3_task_priority_v1.md</code> §1 六条）", "已实现（2026-10-16，六条判据 8/8 实测通过）"],
     ["P1", "时间有效协变量规范：<code>vintage</code>／<code>as_of</code>／<code>missing_reason</code>；缺失语义与 P0 三态同一套机制", "未开始"],
     ["P1-b", "含无危机观察期与观察分母的 0→1 风险集；时间外验证", "未开始"],
     ["后续", "具备识别条件后才讨论 p12、ρ 与财政变量的关系；单条美国序列与年份固定效应完全共线（有效 N = 年份数，行数不解决识别）", "被识别性阻塞"],
@@ -618,9 +618,9 @@ SUM = ('<div class="sum"><b class="tt">正式摘要（只写三件事）</b><ol>
  '<li><b>决策含义</b>：p<sub>12</sub>（×3 ⇒ ×%.2f）、state 2 停留时长（p<sub>21</sub> 0.5→0.025 ⇒ ×%.2f）'
  '与跨区耦合 ρ（1→8 ⇒ ×%.2f）都会显著改变输出，且全部远大于换随机种子的散布 %.3f×；'
  '因此<b>任何单一结果都不应作为经历史校准的风险数字使用</b>。</li></ol>'
- '<div class="stop"><b>升级前提</b>：在 P0（三态标签把"确认发生／确认未发生／证据不足"严格分开，修掉缺失值被转成 <code>False</code>）'
- '以及当前状态证据审核（P1-c）、时间外验证（P1-b）完成之前，本报告的分层结论与曲线<b>不升级为现实风险预测</b>。'
- '继续扩充模拟不是下一步。</div></div>'
+ '<div class="stop"><b>升级前提</b>：P0（三态标签把"确认发生／确认未发生／证据不足"严格分开，修掉缺失值被转成 <code>False</code>）'
+ '已于 2026-10-16 完成并通过 §1 六条判据（8/8）；但在当前状态证据审核（P1-c）与时间外验证（P1-b）完成之前，'
+ '本报告的分层结论与曲线<b>仍不升级为现实风险预测</b>。历史可核验终端正例仍为 0。继续扩充模拟不是下一步。</div></div>'
  % (pct(SC["low"]["p"], 4), pct(mid_p, 4), pct(SC["high"]["p"], 4),
     "{:,}".format(SC["low"]["events"]), "{:,}".format(base["events"]), "{:,}".format(SC["high"]["events"]),
     pct(ceiling, 2), r3, rp21, rrho, spread))

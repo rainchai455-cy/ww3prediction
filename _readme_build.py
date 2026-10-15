@@ -212,7 +212,7 @@ def main():
     pre = [
         title,
         "",
-        "> **本仓库是「报告 + 可复现依赖」的快照，不是模型实现**：`label_status` 三态（P0）未实现，下面任何数字都未经历史校准。定稿快照直链：<https://rainchai455-cy.github.io/ww3prediction/ww3_final_simulation_report_2026-10-15.html>",
+        "> **本仓库是「报告 + 可复现依赖」的快照，不是模型实现**：P0 三态标签已于 2026-10-16 在模型 notebook（cell 7，`d8c53ee6…`）落地并通过六条判据（8/8），但 P1-b 时间外验证与 P1-c 当前起点证据未完成，下面任何数字都未经历史校准。定稿快照直链：<https://rainchai455-cy.github.io/ww3prediction/ww3_final_simulation_report_2026-10-15.html>",
         "> **本文件由 `_readme_build.py` 从同目录 `index.html` 机械转换生成**（图经 ImageMagick/RSVG 栅格化为 `assets/figN.png`）。",
         "> 不要手改正文数字：改 `_report_build.py` → 重建 `index.html` → 重跑本脚本；逐文件哈希与复现命令见 `MANIFEST.md`。",
         "> 同一份内容的网页版：<https://rainchai455-cy.github.io/ww3prediction/>",

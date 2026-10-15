@@ -459,20 +459,29 @@ def ten_delta(end):
 
 D19, D20, D24, D26 = (ten_delta(date(2026, 3, 19)), ten_delta(date(2026, 3, 20)),
                       ten_delta(date(2026, 3, 24)), ten_delta(date(2026, 3, 26)))
-EPISODES = 0; BEST = (0.0, None, None)
+EP_STRICT = EP_BAND = EP_OPEN = 0; BEST = (0.0, None, None); EP_LOST = []
 for _i in range(len(_ys)):
     for _j in range(_i + 1, len(_ys)):
         _cal = (_ys[_j][0] - _ys[_i][0]).days
         if _cal > 30:
             break
         _d10 = _ys[_j][1] - _ys[_i][1]
+        _c = int(round(_ys[_j][1] * 100)) - int(round(_ys[_i][1] * 100))
         if _d10 > BEST[0]:
             BEST = (_d10, _ys[_i][0], _ys[_j][0])
-        if 0.40 <= _d10 <= 0.45:
+        if _c >= 40:
             _sv, _sd0 = _ys[_i][1], _ys[_i][0]
             if not any(_ys[_k][1] < _sv and _sd0 < _ys[_k][0] < _sd0 + timedelta(days=30)
                        for _k in range(len(_ys))):
-                EPISODES += 1
+                EP_OPEN += 1
+                if _c <= 45:
+                    EP_BAND += 1
+                    if not (0.40 <= _d10 <= 0.45):
+                        EP_LOST.append("%s→%s %+dbp 的浮点差是 %s" % (
+                            _ys[_i][0].isoformat(), _ys[_j][0].isoformat(), _c, repr(_d10)))
+                if 0.40 <= _d10 <= 0.45:
+                    EP_STRICT += 1
+EP_OVER = EP_OPEN - EP_BAND
 AT439 = [d.isoformat() for d, v in _y10 if abs(v - 4.39) < 1e-9]
 
 FR, FO, FF, FB = 5.00, 7.00, 4.60, 1.10
@@ -480,7 +489,7 @@ P_OUT, P_REC, GAP90 = 100 * FF / FO, 100 * FF / FR, 0.90 * FO - FF
 EL = {}
 for _b in (4.0, 4.7, 5.5):
     _inc = 0.01 * _b / FB
-    EL[_b] = (_b * 1000.0, 100 * _inc, math.log(1.10) / math.log(1 + _inc))
+    EL[_b] = (_b * 10.0, 100 * _inc, math.log(1.10) / math.log(1 + _inc))
 EL_LO, EL_HI = min(v[2] for v in EL.values()), max(v[2] for v in EL.values())
 F_MOVE = 1.10 ** elast
 F_ORD = math.log10(r_prior / F_MOVE)
@@ -536,7 +545,7 @@ S8 = svg_yield(_y10,
 S8K = '<div class="kpi">' + "".join('<div style="flex:1 1 186px"><b>%s</b><span>%s</span></div>' % (v, l) for v, l in (
     ("%.2f%%" % _LAST[1], "2026-10-14 的 10Y（一手 CSV，197 观测）"),
     ("不可识别", "3 月窗口对所声称的避险机制（不等于「不存在关系」）"),
-    ("%d 次" % EPISODES, "年内从局部低点起 ≤30 日 ≥40bp 的上行次数"),
+    ("%d／%d 次" % (EP_BAND, EP_OPEN), "≤30 日内 40–45bp（含端点）／≥40bp 的上行次数；脚本原浮点判据给 %d" % EP_STRICT),
     ("%.1f%% vs %.1f%%" % (P_OUT, P_REC), "四项刚性合计 ÷支出 与 ÷收入（分母才是关键）"),
     ("%.2f 个数量级" % F_ORD, "财政扰动（×%.3f）相对先验跨度（%.0f×）" % (F_MOVE, r_prior)),
 )) + "</div>"
@@ -552,13 +561,15 @@ S8T = tbl(["声称", "判定", "一手 / 二手"], [
 ])
 
 S8N1 = ('<p class="note"><b>三条不可识别证据</b>（起点同为 %s 的年内低点 %.2f%%）：'
-        '①<b>非唯一</b>——从局部低点起 ≤30 日、涨幅 40–45bp 的上行有 <b>%d 次</b>，年内最大 30 日升幅 <b>+%.0fbp</b>（%s→%s），大于被引那一次；'
+        '①<b>非唯一</b>——从局部低点起 ≤30 日的上行有三种口径：涨幅 40–45bp（含两端）<b>%d 次</b>；只设 ≥40bp 下限、不设上限 <b>%d 次</b>（其中 %d 个超过 45bp）；落盘脚本的浮点判据 <code>0.40≤Δ≤0.45</code> 只给 <b>%d 次</b>：两位小数相减的浮点尾数使 <b>%d</b> 个端点恰在 40bp／45bp 上的窗口被判假（%s）。三者都远大于"唯一"，年内最大 30 日升幅 <b>+%.0fbp</b>（%s→%s）也大于被引那一次；'
     '②<b>端点不唯一</b>——4.39%% 出现在 %s；被当作起点的 3.96%% 与 4.14%% 在全年序列里<b>各出现 0 次</b>；'
     '③<b>曲线形态方向相反</b>——至 03/24 为 10Y +%dbp／2Y +%dbp／3M +%dbp，至 03/26 为 +%dbp／+%dbp／+%dbp：'
     '两种配对下 <b>2 年期涨幅都不小于 10 年期、3 个月期只有个位数 bp</b>，这是政策路径/通胀预期重定价的形状，'
     '不是"仅长端因避险消失而上抬"的形状；且到 03/19 已 +%dbp（占该段 %.0f%%）。'
     '结论固定为：<b>该窗口对避险机制不可识别</b>，不是"已证明避险属性逆转"，也不是"已证明避险机制不存在"。</p>') % (
-    _TR[0].isoformat(), _TR[1], EPISODES, BEST[0] * 100, BEST[1].isoformat(), BEST[2].isoformat(),
+    _TR[0].isoformat(), _TR[1], EP_BAND, EP_OPEN, EP_OVER, EP_STRICT, EP_BAND - EP_STRICT,
+    "；".join(EP_LOST),
+    BEST[0] * 100, BEST[1].isoformat(), BEST[2].isoformat(),
     "、".join(AT439), D24[0], D24[1], D24[2], D26[0], D26[1], D26[2], D19[0], 100.0 * D19[0] / D26[0])
 
 S8N2 = ('<p class="note"><b>"&gt;90%% 的预算"是分母错误而不是数字错误</b>：按本轮口径输入（收入 ~$%.1fT、支出 ~$%.1fT，'
@@ -568,11 +579,12 @@ S8N2 = ('<p class="note"><b>"&gt;90%% 的预算"是分母错误而不是数字�
 
 S8N3 = ('<p class="note"><b>量级链：接线也推不动决策</b>：+100bp 只作用在一年内滚存本息上，'
         '再融资基数 4.0–5.5T ⇒ +$%.0f–%.0fB ⇒ 净利息账单 +%.1f–%.1f%%；要把它写成 p12 ×1.10，'
-        '隐含"利息账单→p12"弹性需为 <b>%.2f–%.2f</b>，本轮未找到任何来源支持弹性 &gt;1。'
+        '隐含"利息账单→p12"的<b>对数</b>弹性需为 <b>%.2f–%.2f</b>（即 <code>ln(1.10)/ln(1+Δ账单)</code>：Δ账单 +%.1f%% 那端给 %.2f、+%.1f%% 那端给 %.2f，弹性与账单增幅反向），本轮未找到任何来源支持弹性 &gt;1。'
         '取本数据自推的指数 P ∝ p12<sup>%.2f</sup>，p12 ×1.10 只给 <b>P ×%.3f</b>，而三档先验跨度是 %.0f×，'
         '相差 <b>%.2f 个数量级</b>。<b>范围限定（不得升级）</b>：这否证的只是"当前先验跨度下财政变量足以改变决策输出"，'
         '不是"财政压力与战争风险无关"；先验跨度一被压缩，本条须重测。</p>') % (
-    EL[4.0][0], EL[5.5][0], EL[4.0][1], EL[5.5][1], EL_LO, EL_HI, elast, F_MOVE, r_prior, F_ORD)
+    EL[4.0][0], EL[5.5][0], EL[4.0][1], EL[5.5][1], EL_LO, EL_HI,
+    EL[5.5][1], EL_LO, EL[4.0][1], EL_HI, elast, F_MOVE, r_prior, F_ORD)
 
 S8N4 = ('<p class="note"><b>文献许可的是交互项，且带两个符号相反的主效应</b>：原文（样本为 Lemke 2003 大国对 1816–1992）'
         '强调战争激励取决于权力转移性质与债务市场基本面的<b>交互</b>，低概率但更极端的权力转移尤其危险；'
@@ -621,3 +633,8 @@ print("WROTE", outp, len(doc), "bytes")
 print("mid_p=%s ci=[%s,%s] ceiling=%s fold=%s r3=%.2f rp21=%.2f rrho=%.2f spread=%s elast=%.2f" %
       (pct(mid_p, 4), pct(mid_lo, 4), pct(mid_hi, 4), pct(ceiling, 2), pct(ceiling_fold, 3), r3, rp21, rrho,
        ("%.3f" % spread) if spread else "n/a", elast))
+print("EP strict/band/open/over/diff = %d/%d/%d/%d/%d  BEST=+%.0fbp %s->%s" %
+      (EP_STRICT, EP_BAND, EP_OPEN, EP_OVER, EP_BAND - EP_STRICT,
+       BEST[0] * 100, BEST[1], BEST[2]))
+print("EL inc=[%.0f,%.0f]B bill=[%.1f,%.1f]%% elast=[%.4f,%.4f] move=%.6f ord=%.4f" %
+      (EL[4.0][0], EL[5.5][0], EL[4.0][1], EL[5.5][1], EL_LO, EL_HI, F_MOVE, F_ORD))

@@ -91,3 +91,9 @@
 - 报告正文写"六个"标签测试，代码实为 7 个（`PASS: 7 pair-aware label tests`）。
 - 终端窗口上限代码 `>89` 天 vs 文档 `≤90` 天。
 - `_as_bool` / `.fillna(False)` 仍把"证据不足"折成负例；`raise ValueError` 路径不产出状态。
+
+## 8. 发布状态（2026-10-16 00:55）
+
+- 已推到 `https://github.com/rainchai455-cy/ww3prediction`，分支 `main`；推送前 `ls-remote` 实测该仓库零 ref，故本次未覆盖任何既有内容。
+- **线上逐字节验收**（走 contents API + `Accept: application/vnd.github.raw`，绕开 raw.githubusercontent 的 CDN 缓存）：`index.html` 50,847 B / sha256 `08acf514022930739e683ab56533177e6ac8313c6a15887769754610efa7aa5a`；`ww3_final_simulation_report_2026-10-15.html` 38,433 B / `69e78e0965460389b7d3246b3f5778dc8fe2c8f6f7e279e4eb76fc9388664202`。两条与 §1 记录一致 ⇒ `.gitattributes` 的 `* -text` 生效，CRLF 未被规范化。
+- **GitHub Pages 尚未开启**：`GET /repos/…/pages` = HTTP 404（未配置）。因此仓库首页现在渲染的是本 `README.md`，`index.html` 只能通过 `/blob/` 页面看源码，站点地址尚不通。开启需在 Settings → Pages 选 `main` + 根目录。

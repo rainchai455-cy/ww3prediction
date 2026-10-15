@@ -108,7 +108,7 @@
 | 文件 | 字节 | sha256（前 8） | 角色 |
 |---|---|---|---|
 | `_readme_build.py` | 7,888 | `c6149345df7fd85e8e85c58e13984a69c54417594e4290d1f1441fcfeacc3460` | HTML→Markdown 转换器（纯标准库 + 系统 `magick`）。输入 `index.html`，输出 `README.md` + `assets/figN.svg/png` |
-| `README.md` | 22,265 | `8b8dbb3763bf74dbc0082f64cdbc2feb30a8adb24473b414c4d72691fe79b7e3` | 由上者生成，212 行：1 个 H1 + 8 个 H2（卡标题带原标签前缀，如 `## L3 先验 ｜ 1. …`）+ 1 个 H3、76 行表格（KPI 也转成表）、6 处 `![图 N](assets/figN.png)`、23 条引用块（原 note/alert + 4 条前置说明） |
+| `README.md` | 22,265 | `8b8dbb3763bf74dbc0082f64cdbc2feb30a8adb24473b414c4d72691fe79b7e3` | 由上者生成，212 行：1 个 H1 + 8 个 H2（卡标题带原标签前缀，如 `## L3 先验 ｜ 1. …`）+ 1 个 H3、**13 张 Markdown 表 / 76 行表体**（KPI 也转成表）、6 处 `![图 N](assets/figN.png)`、23 条引用块（原 note/alert + 4 条前置说明） |
 | `assets/fig1..6.svg` | 2,919 / 1,846 / 2,685 / 3,014 / 6,363 / 5,881 | `d177d0b1` `50d7e2c8` `474281ec` `a59e249d` `f2e18e31` `49da5e2c` | 从 HTML 里原样抽出的 SVG，仅把 `width="100%"` 替换成显式 `width`/`height`（前插会产生重复属性 ⇒ 非法 XML）。**这 6 个哈希才是图的稳定身份**：重跑步骤 4 不变 |
 | `assets/fig1..6.png` | 24,174 / 15,587 / 39,175 / 33,597 / 54,509 / 104,043 | `c40b8d20` `381d4507` `d4295a96` `dda43c49` `05184510` `f4731b01` | `magick -density 144`，尺寸 1635×375 / ×375 / ×450 / ×477 / ×546 / ×525，合计 271,085 B。**PNG 内嵌 tIME 文本块，每次重栅格化哈希都会变**（字节数不变）⇒ 上列哈希只对应 `db7dd68` 这次提交，不能当幂等性检验；幂等只看 `README.md` |
 
@@ -124,8 +124,9 @@
 
 ## 10. 第二轮发布与线上逐字节验收（2026-10-16 01:35）
 
-- 提交 `db7dd68`（17 个文件变更）已推 `origin/main`，快进 `b993e80..db7dd68`，非强推。仓库现 5 个 commit：`9d397ee`→`1a2e5fe`→`810fff5`→`b993e80`→`db7dd68`；受版本控制文件 13 → **29 个**。
+- 提交 `db7dd68`（17 个文件变更）已推 `origin/main`，快进 `b993e80..db7dd68`，非强推。仓库现 5 个 commit：`9d397ee`→`1a2e5fe`→`810fff5`→`b993e80`→`db7dd68`；受版本控制文件 13 → **26 个**（`git ls-files` 实测：新增 `_readme_build.py` 1 个 + `assets/` 12 个；`README.md` 原已跟踪，故只算覆盖不算新增）。
 - **contents API 原始字节**（`Accept: application/vnd.github.raw+json`，带 `?ref=db7dd68`，不走 raw.githubusercontent 的 CDN 缓存）：`index.html` 50,847 B / `5f1f03b6`、`README.md` 22,265 B / `8b8dbb37`、`_readme_build.py` 7,888 B / `c6149345`、`assets/fig6.png` 104,043 B / `f4731b01`、`assets/fig1.png` 24,174 B / `c40b8d20`、定稿快照 38,433 B / `69e78e09` —— 六条与本地工作区逐字节一致（`fig6.png` 另做了 `cmp` 全文件比对，rc=0）。
 - **Pages 首页已随之更新**：<https://rainchai455-cy.github.io/ww3prediction/> = 200、50,847 B、`5f1f03b6`（不再是首轮的 `08acf514…`）；定稿直链 200 / 38,433 B / `69e78e09`；`assets/fig6.png` 200 / 104,043 B / `f4731b01`。
-- **仓库首页确实渲染了报告正文**（`curl https://github.com/rainchai455-cy/ww3prediction`，352,821 B 的 HTML）：6 个 `assets/figN.png` 引用全部出现在 `<img>` 里、14 个 `<table>`、21 个 `<h2>`；探针串命中次数——"代理触发比例" 6、"不可识别" 4、"4811" 5、"17.07%" 9、`Wang &amp; Ruggiero` 1、"净利息" 4、"$1T" 3。即 Markdown 管线没剥掉表格与图，实体也没丢。
+- **仓库首页确实渲染了报告正文**（`curl https://github.com/rainchai455-cy/ww3prediction` 页面 HTML 352,821 B）：6 个 `assets/figN.png` 引用全部出现在 `<img>` 里；探针串命中次数——"代理触发比例" 6、"不可识别" 4、"4811" 5、"17.07%" 9、`Wang &amp; Ruggiero` 1、"净利息" 4、"$1T" 3。即 Markdown 管线没剥掉表格与图，实体也没丢。
+- 一条计数口径的更正：本条初稿写"14 个 `<table>`、21 个 `<h2>`"，那是**整页** grep 值，含 GitHub 自己的文件列表 chrome。README 自身的量按 `grep -c` 实测是 **13 张表 / 8 个 H2 / 1 个 H1 / 1 个 H3 / 6 处图片引用**（见 §9 行内的 76 行表格计数）。引用时按 README 口径，不要把整页计数当报告结构。
 - 本文件（`MANIFEST.md`）自身不参与逐字节记录：每追加一轮记录它就变哈希，把它写进表里等于制造一条必然过期的断言。

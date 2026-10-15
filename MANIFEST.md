@@ -2,7 +2,7 @@
 
 建立时间 2026-10-16 00:04。本目录是自包含的**报告 + 执行依赖**快照，不是模型实现目录。里面没有任何代码通过 P0；`label_status` 三态仍未实现。
 
-> **本仓库（公开站）与本地交付目录的映射**：本文件是从交付目录带过来的记录，表中路径按交付目录写。两处差异：① `index.html` = 表中的 `ww3_final_simulation_report_2026-10-16.html`（同字节、同哈希 `08acf514…`）；② 表中 `us_debt/section10_draft_asis.md` 与 `us_debt/pending_patch.md` 未随本仓库发布（内部评审过程），其余 9 个文件逐字节一致。文中 `<upstream>/` 指本地未发布的上游目录。
+> **本仓库（公开站）与本地交付目录的映射**：本文件是从交付目录带过来的记录，表中路径按交付目录写。三处差异：① `index.html` = 表中的 `ww3_final_simulation_report_2026-10-16.html`（同字节、同哈希 `5f1f03b6…`）；② 表中 `us_debt/section10_draft_asis.md` 与 `us_debt/pending_patch.md` 未随本仓库发布（内部评审过程），其余文件逐字节一致；③ 本仓库另有**公开站专属产物**，不在下表：`README.md`、`_readme_build.py`、`assets/fig1..6.svg|png`（12 个文件）、`.nojekyll`、`.gitattributes`——详见 §8。文中 `<upstream>/` 指本地未发布的上游目录。
 
 ## 1. 目录内容
 
@@ -10,8 +10,8 @@
 |---|---|---|---|
 | `ww3_final_simulation_report_2026-10-15.html` | 38,433 | `69e78e0965460389b7d3246b3f5778dc8fe2c8f6f7e279e4eb76fc9388664202` | **定稿快照**（与 `<upstream>/` 同名文件逐字节一致，本目录内不参与被覆盖） |
 | `_report_sim.py` | 5,102 | `adc9364f6d21b9d14e982e44d2e4c78feace96cf88ea3d191391a8a2df2eef8b` | 蒙特卡洛驱动（27 个 run，同批种子） |
-| `_report_build.py` | 48,594 | `d850d072f16ff1a184dd3b4fe9ad7d046ce9a04644293d424915aee5f5710be9` | 图表/正文构建（纯 SVG，无绘图库依赖）。**本目录版含卡 8「美债补充项」163 行，与原工作区脚本不再等价**（见 §3） |
-| `ww3_final_simulation_report_2026-10-16.html` | 50,847 | `08acf514022930739e683ab56533177e6ac8313c6a15887769754610efa7aa5a` | **当前版报告（8 卡 / 6 图）**，= 上面 build 脚本跑出的产物；含卡 8 |
+| `_report_build.py` | 48,554 | `784c9b8ae6c81f37daf27a7926afdb5ef54327995749f12886d5367fc16ab939` | 图表/正文构建（纯 SVG，无绘图库依赖）。**本目录版含卡 8「美债补充项」163 行，与原工作区脚本不再等价**（见 §3）。本版修掉了 5/6 张图的 `font-family` 非法引号（见 §4） |
+| `ww3_final_simulation_report_2026-10-16.html` | 50,847 | `5f1f03b69d10a4f4452b5876992eb471cb80775f7f4503702b92581e0e3bf688` | **当前版报告（8 卡 / 6 图）**，= 上面 build 脚本跑出的产物；含卡 8。本仓库内同一份字节以 `index.html` 发布 |
 | `_report_data.json` | 6,581 | `910c9309f71ac480bbd3973adec9e702767c076769ba5b32b22737acca4d5ed0` | 唯一中间数据：全部结果 + 每个 run 的种子 + 代理暴露率 |
 | `us_debt/evidence/_tyc2026.csv` | 16,067 | `bec74a6c0f118755eee4855ab6dc4fa924e6c08b6361e23b6c2e2590f2cb271c` | 一手证据（Treasury 日度曲线 2026，197 观测）。不是 `_report_sim.py` 的依赖，但**是 `_report_build.py` 卡 8 的构建期依赖**：缺文件即 `SystemExit`，卡内每个收益率数字都由它现算 |
 | `us_debt/check_fiscal_claims.py` | 3,189 | `8392f5e50fbab5855450ae14703bd0b106cf9f4b820ad7062a291013fbb57c13` | 美债部分唯一可执行核验：从上面那个 CSV 重算正文每个数字（纯标准库，无 numpy、无网络） |
@@ -30,6 +30,7 @@
 步骤 1  <python> _report_sim.py      # 约 158 s，覆写本目录 _report_data.json
 步骤 2  <python> _report_build.py    # 秒级，读 _report_data.json + us_debt\evidence\_tyc2026.csv，写 output\ww3_final_simulation_report_2026-10-16.html，不碰 10-15 定稿快照
 步骤 3  <python> us_debt\check_fiscal_claims.py   # 秒级，只读 us_debt\evidence\_tyc2026.csv，重算美债部分全部数字，不写文件
+步骤 4  <python> _readme_build.py    # 仅公开站需要：读 index.html，写 README.md + assets\figN.svg/png；需系统 ImageMagick（带 RSVG delegate），不碰 HTML
 ```
 
 单跑步骤 2 即可重建当前版报告（`_report_data.json` 与 CSV 都已在目录内；CSV 缺失时脚本以 `SystemExit` 明确失败，不会静默少一张卡）。单跑步骤 3 即可独立复核卡 8 每个数字——它与卡 8 读同一份 CSV、走同一条算式，但代码彼此独立，互为对照。三条阻塞与顺序表是决策记录，不需要重算。
@@ -61,8 +62,9 @@
 
 - `py_compile` 两个脚本通过。
 - **定稿复现证明（由加卡 8 之前的 build 版本 `8550b757…` 做出，当时实测）**：只跑步骤 2，产物 38,433 B；把生成时间戳归一化后与定稿逐字符相同（各 30,203 字符）。唯一差异是 `<div class="head">` 里的"生成于 2026-10-15 23:20" → "2026-10-16 00:04"。该证明**不适用于当前 build 脚本**（见 §3 范围说明）。
-- **当前版（含卡 8）实测**：`_report_build.py` `d850d072…` 跑步骤 2 → `output/ww3_final_simulation_report_2026-10-16.html` 50,847 B / 39,740 字符 / 8 张卡 / 6 幅内联 SVG；根目录副本与 `output/` 那份同哈希 `08acf514…`。卡 8 的 18 个探针串全部命中（19 次、+54bp、5.19%、不可识别、65.7%、92.0%、1.70、1.95、2.67、×1.212、4811、3.60 个数量级、三次出现、indeterminate_resolution、+42bp、+58bp、Lemke、403）。
+- **当前版（含卡 8）实测**：`_report_build.py` `d850d072…` 跑步骤 2 → `output/ww3_final_simulation_report_2026-10-16.html` 50,847 B / 39,740 字符 / 8 张卡 / 6 幅内联 SVG；根目录副本与 `output/` 那份同哈希 `08acf514…`。卡 8 的 18 个探针串全部命中（19 次、+54bp、5.19%、不可识别、65.7%、92.0%、1.70、1.95、2.67、×1.212、4811、3.60 个数量级、三次出现、indeterminate_resolution、+42bp、+58bp、Lemke、403）。**其后**修 `font-family` 合法性（`784c9b8a…`）重跑步骤 2：产物仍 50,847 B / 8 卡 / 6 图，哈希变为 `5f1f03b6…`，18 个探针串复测仍全部命中，定稿快照未被写。
 - **界面自检**：headless Edge 1180×9500 截图，`-trim` 内容边界 1120×7138+30+26；卡 8 区域逐块目视过。修掉的三处排版缺陷：①右上 "10/05 峰 5.31%" 原先越出画布被裁；②橙色 "4.39%（03/20、03/24、05/01 三次出现）" 长标签压在折线上，改为 "4.39%（三次出现）"，三个日期改由正文注 ② 承载（`AT439` 现算）；③ 5 个 KPI 原先 4+1 换行、第 5 个被拉成整行，改内联 `flex:1 1 186px` 后单行等宽（页高 7229→7138）。
+- **SVG 标记合法性缺陷（由栅格化管线发现，不是浏览器发现）**：卡 1–5 的 5 幅内联 SVG 写成 `font-family=''Microsoft YaHei',…'`——嵌套单引号让属性值提前闭合，不是合法 XML。浏览器按 HTML 解析器容错，所以网页版一直看着正常；librsvg 直接拒绝（`unable to read image data`）。定位前先做正对照（一张最小中文 SVG 能正常转 PNG），排除管线自身问题后才回到源文件。已在 `_report_build.py` 四处改为双引号包裹 ⇒ 10-16 版哈希 `08acf514…` → `5f1f03b6…`，字节数仍是 50,847。**定稿快照（`69e78e09…`）与原工作区脚本（`6ad5eb5a…`）仍带此缺陷，按"定稿不再改动"未回改**；它只影响严格 XML 解析（如栅格化），不影响浏览器渲染。
 - 关键标量重建后一致：`mid_p=0.0145%`、`ci=[0.0123%,0.0171%]`、`ceiling=17.07%`、`fold=0.425%`、`r3=9.21`、`rp21=5.72`、`rrho=6.13`、`spread=1.095`、`elast=2.02`。
 - 蒙特卡洛侧（上一轮已做，本目录未重跑）：同种子重跑 27 个 run，事件数逐一复现 3/145/14432；3/21/58/102/157；12/140/613/1289/3199；198/166/128/85/45/29；78/137/249/478；147/150/145/137。
 - 美债侧（步骤 3，本目录内已实跑）：`check_fiscal_claims.py` 从 CSV 重算出 19 次 ≤30 日 40–45bp 上行、最大 30 日升幅 +54bp、3.96 与 4.14 各出现 **0 次**、4.39 出现 3 次、两组端点配对 42/52/7 与 45/58/6、65.7% 与 92.0%、补平支出分母需再 1.70T、隐含对数弹性 1.95–2.67、4811÷1.212 = 3,968 倍（3.60 个数量级）。与 `audit_findings.md` 引用值逐项一致；输出已落盘为 `evidence/check_output_2026-10-16.txt`。
@@ -92,9 +94,30 @@
 - 终端窗口上限代码 `>89` 天 vs 文档 `≤90` 天。
 - `_as_bool` / `.fillna(False)` 仍把"证据不足"折成负例；`raise ValueError` 路径不产出状态。
 
-## 8. 发布状态（2026-10-16 00:55）
+## 8. 发布状态（首轮，2026-10-16 00:55 推送 / 01:05 Pages 实测）
 
 - 已推到 `https://github.com/rainchai455-cy/ww3prediction`，分支 `main`；推送前 `ls-remote` 实测该仓库零 ref，故本次未覆盖任何既有内容。
 - **线上逐字节验收**（走 contents API + `Accept: application/vnd.github.raw`，绕开 raw.githubusercontent 的 CDN 缓存）：`index.html` 50,847 B / sha256 `08acf514022930739e683ab56533177e6ac8313c6a15887769754610efa7aa5a`；`ww3_final_simulation_report_2026-10-15.html` 38,433 B / `69e78e0965460389b7d3246b3f5778dc8fe2c8f6f7e279e4eb76fc9388664202`。两条与 §1 记录一致 ⇒ `.gitattributes` 的 `* -text` 生效，CRLF 未被规范化。
 - **Pages 已开启（2026-10-16 01:05 实测）**：<https://rainchai455-cy.github.io/ww3prediction/> 返回 HTTP 200、**50,847 B / sha256 `08acf514022930739e683ab56533177e6ac8313c6a15887769754610efa7aa5a`**，与仓库内 `index.html` 逐字节一致 ⇒ 报告即站点首页，且换行符未被改动。定稿直链 38,433 B、`us_debt/evidence/_tyc2026.csv` 16,067 B、`MANIFEST.md` 13,031 B 均 200；`_report_build.py` 也返回 200（证明 `.nojekyll` 生效，下划线开头文件没被 Jekyll 排除）。
 - 一条如实记录的不一致：站点已可访问，但 `GET /repos/…/pages`（未鉴权）仍返回 **HTTP 404**。以站点实测 200 为准；该 API 结果不作为"未部署"的证据。
+
+## 9. 公开站专属产物：README 直接渲染报告（2026-10-16 01:20）
+
+仓库首页只渲染 `README.md`（不会内联渲染 `.html`），而 GitHub 的 Markdown 管线会**剥掉原始 HTML 与 `<svg>`** ⇒ 要让首页"看起来就是报告"，只能把 HTML 机械转成 Markdown、把 6 幅 SVG 栅格化成 PNG。做法是派生产物而非手抄：
+
+| 文件 | 字节 | sha256（前 8） | 角色 |
+|---|---|---|---|
+| `_readme_build.py` | 7,888 | `c6149345df7fd85e8e85c58e13984a69c54417594e4290d1f1441fcfeacc3460` | HTML→Markdown 转换器（纯标准库 + 系统 `magick`）。输入 `index.html`，输出 `README.md` + `assets/figN.svg/png` |
+| `README.md` | 22,265 | `8b8dbb3763bf74dbc0082f64cdbc2feb30a8adb24473b414c4d72691fe79b7e3` | 由上者生成，212 行：1 个 H1 + 8 个 H2（卡标题带原标签前缀，如 `## L3 先验 ｜ 1. …`）+ 1 个 H3、76 行表格（KPI 也转成表）、6 处 `![图 N](assets/figN.png)`、23 条引用块（原 note/alert + 4 条前置说明） |
+| `assets/fig1..6.svg` | 2,919 / 1,846 / 2,685 / 3,014 / 6,363 / 5,881 | — | 从 HTML 里原样抽出的 SVG，仅把 `width="100%"` 替换成显式 `width`/`height`（前插会产生重复属性 ⇒ 非法 XML） |
+| `assets/fig1..6.png` | 24,174 / 15,587 / 39,175 / 33,597 / 54,509 / 104,043 | `89356d31` `9c85909f` `8570d46d` `38b56516` `5f9eb24c` `ce7527a4` | `magick -density 144`，尺寸 1635×375 / ×375 / ×450 / ×477 / ×546 / ×525，合计 271,085 B |
+
+一致性与自检（全部实测）：
+
+- **数字同源性**：README 正文与 `index.html` 由同一棵树转换得出，脚本内没有硬编码任何报告数字；唯一硬编码的是那三行"本文件为派生产物"的说明。
+- **实体不丢**：转换器用 `convert_charrefs=False` 并显式接住 `handle_entityref`/`handle_charref`。早期版本把 `&gt;`/`&amp;` 静默丢掉过，现以三个探针复验：`净利息 >$1T`、`Wang & Ruggiero`、`弹性 >1` 各命中 1 次。
+- **图无裁切**：6 张 PNG 逐一 `-trim` 取内容边界，右边界距画布边缘 25–36 px（fig2 左边界仅剩 1 px 但未被切）；fig2–fig5 拼成一张 1635×1880 蒙太奇后目视过（中文正常、坐标轴与图例完整）。
+- **一处布局 bug 由自检发现并修**：结构性容器原本被并成单个 block，导致"派生产物"说明落到文末；改为摊平后它在 H1 正下方，正文部分逐字节未变（前后 diff 只有那 6 行的位置）。
+- **幂等**：连跑两次输出 `README.md` 同哈希（PNG 内嵌 tIME 会变，不影响 Markdown 引用）。
+- **它替换掉了什么**：首轮提交（`b993e80`）的 `README.md` 是 5,291 B 手写仓库说明，已被本派生版整体覆盖。手写版里的三样东西各有去处：状态声明（"不是模型实现 / P0 未实现 / 未经校准"）与定稿直链进前置引用块第 1 条，网页版直链进第 4 条，口径边界与文件表不再重复——正文本身就是报告，第二份摘要只会制造第二个真值源。
+- 维护链：改 `_report_build.py` → 重跑步骤 2 → `cp` 成 `index.html` → 重跑步骤 4。**不要手改 `README.md` 正文数字**。

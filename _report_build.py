@@ -46,7 +46,7 @@ def svg_log_bars(items, w=1090, h=330, pad_l=252, pad_r=24, pad_t=26, pad_b=64, 
     tmin, tmax = math.log10(vmin) - 0.35, math.log10(vmax) + 0.25
     X = lambda v: pad_l + (math.log10(v) - tmin) / (tmax - tmin) * (w - pad_l - pad_r)
     n = len(items); rowh = (h - pad_t - pad_b) / n
-    s = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="100%%" font-family=%s>' % (w, h, "'" + FONT + "'")]
+    s = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="100%%" font-family="%s">' % (w, h, FONT)]
     s.append('<rect x="0" y="0" width="%d" height="%d" fill="#fff"/>' % (w, h))
     ticks = nice_log(10 ** tmin, 10 ** tmax)
     for t in ticks:
@@ -81,7 +81,7 @@ def svg_line(xs, ys, lo, hi, w=1090, h=300, pad_l=92, pad_r=24, pad_t=22, pad_b=
     ymax = max(hi) * 1.25
     X = lambda i: pad_l + i * (w - pad_l - pad_r) / (len(xs) - 1)
     Y = lambda v: h - pad_b - v / ymax * (h - pad_t - pad_b)
-    s = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="100%%" font-family=%s>' % (w, h, "'" + FONT + "'")]
+    s = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="100%%" font-family="%s">' % (w, h, FONT)]
     s.append('<rect width="%d" height="%d" fill="#fff"/>' % (w, h))
     for k in range(5):
         v = ymax * k / 4; y = Y(v)
@@ -103,7 +103,7 @@ def svg_line(xs, ys, lo, hi, w=1090, h=300, pad_l=92, pad_r=24, pad_t=22, pad_b=
 
 def svg_matrix(rows, cols, cells, w=1090, h=None, cellw=150, cellh=42, pad_l=300, pad_t=54):
     h = h or (pad_t + cellh * len(rows) + 58)
-    s = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="100%%" font-family=%s>' % (w, h, "'" + FONT + "'")]
+    s = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="100%%" font-family="%s">' % (w, h, FONT)]
     s.append('<rect width="%d" height="%d" fill="#fff"/>' % (w, h))
     for j, c in enumerate(cols):
         s.append('<text x="%.1f" y="%d" font-size="12.5" font-weight="600" fill="%s" text-anchor="middle">%s</text>' %
@@ -135,7 +135,7 @@ def svg_tornado(items, w=1090, h=None, pad_l=300, pad_r=48, pad_t=44, rowh=44):
     hi_lim = 10 ** math.ceil(math.log10(max(vals)))
     plotw = w - pad_l - pad_r
     X = lambda v: pad_l + (math.log10(v) - math.log10(lo_lim)) / (math.log10(hi_lim) - math.log10(lo_lim)) * plotw
-    s = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="100%%" font-family=%s>' % (w, h, "'" + FONT + "'")]
+    s = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %d %d" width="100%%" font-family="%s">' % (w, h, FONT)]
     s.append('<rect width="%d" height="%d" fill="#fff"/>' % (w, h))
     t = lo_lim
     while t <= hi_lim * 1.000001:

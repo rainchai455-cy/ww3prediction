@@ -90,9 +90,9 @@
 
 ## 7. 已知未修项（沿用他 V0.3 工作单，本目录不掩盖）
 
-- 报告正文写"六个"标签测试，代码实为 7 个（`PASS: 7 pair-aware label tests`）。
-- 终端窗口上限代码 `>89` 天 vs 文档 `≤90` 天。
-- `_as_bool` / `.fillna(False)` 仍把"证据不足"折成负例；`raise ValueError` 路径不产出状态。
+- 报告正文写"六个"标签测试，代码实为 7 个（`PASS: 7 pair-aware label tests`）。〔2026-10-16 04:15 定位更正：这句"六个"在他方 **notebook 的 markdown cell**（原文"六个合成标签测试全部通过…"），代码打印 7；本条写作"报告正文"不准确。本站发布件里不存在这句 ⇒ `grep -c '标签测试'` 在 `index.html` 与 `README.md` 均 **0**，"六个"各 3 处命中全部指"六个来源"，不在线上门面上。仍是待统一项（`ww3_task_priority_v1.md:68` 已登记，冻结文件我不改）。〕
+- 终端窗口上限代码 `>89` 天 vs 文档 `≤90` 天。〔**2026-10-16 已闭合**：cell 7 现 `> 90`，边界由用例 U12 锁定（90 天跨度不触发异常、91 天触发 `window_exceeds_90_calendar_days`）。发布件里 `grep -c '>89'` = **0**。详见 §13、§14 与 `<upstream>/audit/independent_gate_report_2026-10-15.md` §11。〕
+- `_as_bool` / `.fillna(False)` 仍把"证据不足"折成负例；`raise ValueError` 路径不产出状态。〔**2026-10-16 已闭合**：cell 7 里 `_as_bool`、`.fillna(False)`、`raise ValueError` 各 **0** 次命中，缺失走单一三值判断，两条 `raise` 路径改返回 `indeterminate_resolution` + 诊断计数 `unverified_pair_endpoints`。页面上这两个符号仍各出现 1 次，但都在"折叠已删除"这句过去式里（`index.html`／`README.md` 同句），不是现存缺陷的陈述。〕
 
 ## 8. 发布状态（首轮，2026-10-16 00:55 推送 / 01:05 Pages 实测）
 

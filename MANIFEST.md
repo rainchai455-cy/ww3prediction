@@ -17,8 +17,8 @@
 | `us_debt/check_fiscal_claims.py` | 3,189 | `8392f5e50fbab5855450ae14703bd0b106cf9f4b820ad7062a291013fbb57c13` | 美债部分唯一可执行核验：从上面那个 CSV 重算正文每个数字（纯标准库，无 numpy、无网络） |
 | `us_debt/evidence/check_output_2026-10-16.txt` | 1,242 | `0613e5bad9fcad368d4bf0815652af6a595f1b2146f0ef1b88a3ec1ea4252c5a` | 上述脚本上次运行的原样输出（21 行），供离线对账 |
 | `us_debt/audit_findings.md` | 9,472 | `dfe2166c0cdc594c9777158f3b51f1c14a132e8c3e8aac33b18a91fefd84bee7` | 美债模块审计记录（出处门 7 项、不可识别判定、90% 分母、量级检验、三条阻塞、顺序表；71 行） |
-| `us_debt/section10_draft_asis.md` | 7,640 | `1a58f30cc0391d9c16335302d7b7298e394bc82a7c74b0eec632fe0c9d1eef17` | 他方 §10 草稿的**原样快照**（未改一字），含 2 处待改，见 `pending_patch.md` P1–P3 |
-| `us_debt/pending_patch.md` | 4,636 | `2716b8c62e3df6d4934e713723107ea0aba6cda8e716f90fac980c5f6645bbd3` | 7 条定点补丁（3 必改 + 4 建议），**尚未执行** |
+| `us_debt/section10_draft_asis.md` | 7,640 | `1a58f30cc0391d9c16335302d7b7298e394bc82a7c74b0eec632fe0c9d1eef17` | 他方 §10 草稿的**原样快照**（未改一字，合并后仍按原样保留）。其中 3 处必改（P1–P3）已于 2026-10-16 在并入审计报告时执行，见该报告 §10.8。**未随本仓库发布** |
+| `us_debt/pending_patch.md` | 5,237 | `47c984ec30f13caddb0e59e7efeea92876bc994b123e64fe4d36d72ffa39e0b9` | 7 条定点补丁（3 必改 + 4 建议）的**指令原件**；2026-10-16 已执行（P1–P5、P7 入 §10，P6 作废），顶部已标注执行状态，正文按原件保留未回改。**未随本仓库发布** |
 | `output/`（重建后生成） | — | — | 你自己重跑时报告的落点；刻意与定稿分开，避免覆盖 |
 
 依赖闭包：`numpy`（仅 `_report_sim.py`）+ 标准库（math/json/time/os/csv/html/datetime）。**无 matplotlib、无 pandas、无网络访问、无 notebook 参与**；全部图形是构建脚本自己拼的内联 SVG，产物是单文件 HTML（除 SVG 命名空间 URL 外无任何外部引用，可直接作静态首页）。
@@ -85,7 +85,7 @@
 
 - 模型代码与 notebook（P0 未动，不得声称已实现三态标签）。
 - `ww3_terminal_layer_gate_freeze_v1.md`、`ww3_task_priority_v1.md`、审计报告正文——仍各自在原处，本目录只放快照与副本，不放第二真值源。
-- §10 仍未合并进审计报告：`audit/independent_gate_report_2026-10-15.md` 仍 195 行、前 153 行锚点 `87575855…f404c6` 未变。本目录 `us_debt/` 里放的是**副本**（他方原样快照 + 我方审计记录 + 未执行补丁），原仓库根目录的 `ww3_section10_append_draft_2026-10-15.md` 未被本目录操作改动。
+- §10 **已于 2026-10-16 合并进审计报告**（该报告不在本仓库，位于 `<upstream>/audit/independent_gate_report_2026-10-15.md`）：195 行 → **271 行 / 41,713 B / sha256 `58e5faf4…`**；**纯追加**（末尾 `---` + 74 行新 §10），前 153 行锚点复验仍为 `87575855…f404c6`，合并前备份 `<upstream>/audit/_premerge_backup_independent_gate_report_2026-10-16.md`（`7cc00a69…`）。执行 P1–P5、P7，**P6 作废**（目标措辞在两份 HTML 报告里各 0 处命中），依据与我方两处数字更正记在新 §10.8。本目录 `us_debt/` 里放的是**副本**（他方原样快照 + 我方审计记录 + 补丁指令原件），真值源是那份审计报告；`<upstream>/ww3_section10_append_draft_2026-10-15.md`（`1a58f30c…`，56 行）未被改动。
 - `ww3_risk_model_v0_3_bundle.zip`（未重打包，与 bundle 目录不一致；重打包=覆盖既有产物，需另下指令）。
 
 ## 7. 已知未修项（沿用他 V0.3 工作单，本目录不掩盖）
@@ -130,3 +130,15 @@
 - **仓库首页确实渲染了报告正文**（`curl https://github.com/rainchai455-cy/ww3prediction` 页面 HTML 352,821 B）：6 个 `assets/figN.png` 引用全部出现在 `<img>` 里；探针串命中次数——"代理触发比例" 6、"不可识别" 4、"4811" 5、"17.07%" 9、`Wang &amp; Ruggiero` 1、"净利息" 4、"$1T" 3。即 Markdown 管线没剥掉表格与图，实体也没丢。
 - 一条计数口径的更正：本条初稿写"14 个 `<table>`、21 个 `<h2>`"，那是**整页** grep 值，含 GitHub 自己的文件列表 chrome。README 自身的量按 `grep -c` 实测是 **13 张表 / 8 个 H2 / 1 个 H1 / 1 个 H3 / 6 处图片引用**（见 §9 行内的 76 行表格计数）。引用时按 README 口径，不要把整页计数当报告结构。
 - 本文件（`MANIFEST.md`）自身不参与逐字节记录：每追加一轮记录它就变哈希，把它写进表里等于制造一条必然过期的断言。
+
+---
+
+## 11. §10 并入审计报告后，公开站的实际状态（2026-10-16 01:50）
+
+- **本轮改动分两步测得，两次都对本文件之外零影响**。第一步：把 §1 的 `section10_draft_asis.md`、`pending_patch.md` 两行注记与 §6 的"§10 仍未合并"改成"已合并"，`git diff --stat` = `MANIFEST.md | 6 +++---`（**3 insertions / 3 deletions**）。第二步：追加本节本身，提交时的总 diff 为 **15 insertions / 3 deletions**（= 第一步的 3/3 + 本节新增 12 行）。两步里 `index.html`、`README.md`、`_report_build.py`、`_readme_build.py`、`assets/` 12 个与 `us_debt/` **一个字节都没动**，`git status --short` 始终只列出 `M MANIFEST.md`；发布物哈希不变：`index.html` 50,847 B / `5f1f03b6…`、`README.md` 22,265 B / `8b8dbb37…`。
+- **合并没有让公开站与审计报告出现数字分歧**：卡 8 的收益率数值是 `_report_build.py` 从 `_tyc2026.csv` 现算的，落稿时写的就是否证口径，而不是他方草稿里的被否证值。在已发布的 `index.html`（`README.md` 同源，同样命中）里实测：
+  - 原始字节 `grep -o` 计数——`3.96%` 2 处、`4.14%` 2 处、`避险` 5 处、`达利欧` 1 处；逐处看过上下文，这四处都是**在否证句或出处门表里**出现（"3.96% → 4.39%（冲突后）｜起点值不在序列里（全年最低 3.97%）；端点非唯一"），不是被当作观测值引用。
+  - 去标签、并空白后的正文里，下列句子各命中 1 次：`各出现 0 次`（完整句："被当作起点的 3.96% 与 4.14% 在全年序列里 各出现 0 次"）、`涨幅 40–45bp 的上行有 19 次`、`最大 30 日升幅 +54bp`、`至 03/26 为 +45bp`、`占该段 62%`、`该窗口对避险机制不可识别`、`无源，不得作直接引语`。注意 P2 的三段配对（+42/+45）在站里是分开写的，没有混用成一个终点。
+  - 命中 **0 次**：`美债收益率不再因地缘冲突而下降`。这就是 §10.8 里 P6 作废的同一依据，在站侧再验一遍。
+- 因此**不重建 HTML、不重跑 README 管线**：P1–P3 纠正的对象是他方草稿文件，公开站从未登过那三个错值；P6 要改的措辞在站里不存在。合并后的审计报告本身仍只在 `<upstream>/audit/`，不上传本仓库（三方对账文档，公开站只放报告与其可复现依赖）。
+- 一条自身操作更正，如实登记：本轮原先想用 `printf` 追加本节，双引号里的反引号被 bash 当命令替换执行了，PATH 上的 `/d/bin/README.md`、`trng` 因此被当脚本跑了一遍，并在仓库根目录留下 3 个未跟踪文件（`secret.bin` 32 B、`trng` 0 B、`⚠️` 0 B，mtime 01:50:51/01:50:55）。已 `rm -f` 删除并复验：`git status --short` 回到只有 `M MANIFEST.md`，`git ls-files` 仍 26 个，§1 表格里受控文件逐字节核对 **checked=10 bad=3**，三条 MISSING 恰是开头映射说明里已声明的三个（`ww3_final_simulation_report_2026-10-16.html` 以 `index.html` 名发布 + 两个未发布的 `us_debt/` 内部件）。教训：含反引号的中文段落一律走 Edit，不走 shell。

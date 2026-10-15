@@ -96,4 +96,5 @@
 
 - 已推到 `https://github.com/rainchai455-cy/ww3prediction`，分支 `main`；推送前 `ls-remote` 实测该仓库零 ref，故本次未覆盖任何既有内容。
 - **线上逐字节验收**（走 contents API + `Accept: application/vnd.github.raw`，绕开 raw.githubusercontent 的 CDN 缓存）：`index.html` 50,847 B / sha256 `08acf514022930739e683ab56533177e6ac8313c6a15887769754610efa7aa5a`；`ww3_final_simulation_report_2026-10-15.html` 38,433 B / `69e78e0965460389b7d3246b3f5778dc8fe2c8f6f7e279e4eb76fc9388664202`。两条与 §1 记录一致 ⇒ `.gitattributes` 的 `* -text` 生效，CRLF 未被规范化。
-- **GitHub Pages 尚未开启**：`GET /repos/…/pages` = HTTP 404（未配置）。因此仓库首页现在渲染的是本 `README.md`，`index.html` 只能通过 `/blob/` 页面看源码，站点地址尚不通。开启需在 Settings → Pages 选 `main` + 根目录。
+- **Pages 已开启（2026-10-16 01:05 实测）**：<https://rainchai455-cy.github.io/ww3prediction/> 返回 HTTP 200、**50,847 B / sha256 `08acf514022930739e683ab56533177e6ac8313c6a15887769754610efa7aa5a`**，与仓库内 `index.html` 逐字节一致 ⇒ 报告即站点首页，且换行符未被改动。定稿直链 38,433 B、`us_debt/evidence/_tyc2026.csv` 16,067 B、`MANIFEST.md` 13,031 B 均 200；`_report_build.py` 也返回 200（证明 `.nojekyll` 生效，下划线开头文件没被 Jekyll 排除）。
+- 一条如实记录的不一致：站点已可访问，但 `GET /repos/…/pages`（未鉴权）仍返回 **HTTP 404**。以站点实测 200 为准；该 API 结果不作为"未部署"的证据。
